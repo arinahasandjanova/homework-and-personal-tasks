@@ -20,7 +20,23 @@ void printmatrix(std::vector<std::vector<int>> matrix){
 	}
 	}
 int main(){
-	std::vector<std::vector<int>> matrix1 {{1, 2, 3}, {3, 4, 5}, {4, 5, 6}, {7, 8, 9}};
+	int n;
+	int m;
+	int a;
+	std::cout<<"print the count of rows: \n";
+	std::cin>>n;
+	std::cout<<"print the count of columns: \n";
+	std::cin>>m;
+	std::vector<std::vector<int>> matrix1 (n, std::vector<int>(m));
+	std::cout<<"\n";
+	std::cout<<"print n*m numbers: \n";
+	for(int i=0; i!=n; ++i){
+		for(int j=0; j!=m; ++j){
+			std::cin>>a;
+			matrix1[i][j]=a;
+		}
+	}
+	std::cout<<"\n";
 	printmatrix(matrix1);
 	std::vector<std::vector<int>> rmatrix1 = matrix(matrix1);
 	std::cout<<"\n";
