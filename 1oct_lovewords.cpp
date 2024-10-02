@@ -13,7 +13,7 @@ std::string only_word(std::string& word){
 	}
 int main(){
 	std::map<std::string, int> words_love;
-	std::ifstream love("love.txt");
+	std::ifstream love("love1.txt");
 	std::unordered_set<std::string> love_word;
 	std::string word;
 	double box_number=0;
