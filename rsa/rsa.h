@@ -60,44 +60,53 @@ public:
         return big_number[index];
     }
     
-    std::string numberToText() const {
-		std::string text;
-		for (size_t i = 0; i < big_number.size(); i += 3) {
-			if (i + 2 < big_number.size()) {
-				int val;
-				val = 100*big_number[i] + 10*big_number[i + 1] + big_number[i + 2];
-				char c = static_cast<char>(val);
-				text += c; 
-			}
-			if (i + 2 == big_number.size()) {
-				int val;
-				val = 10*big_number[i] + big_number[i + 1];
-				char c = static_cast<char>(val);
-				text += c; 
-			}
-		}
-		return text;
-	}
-	
-	void textToNumber(const std::string& text) {
-		big_number.clear();
-		for (char c : text) {
-			int digit = static_cast<int>(c);
-			*this = Vector({0, digit});
-		}
-	}
-    
-    Vector operator*(const Vector& other) const {
-        size_t max = std::max(big_number.size(), other.big_number.size());
-        size_t lenght = 2 * max;
-        Vector result(lenght);
-        for (size_t i = 0; i < big_number.size(); ++i){
-            for (size_t j = 0; j < other.big_number.size(); ++j){
-                result.big_number[i + j] += big_number[i] * other.big_number[j];
+    static Vector stringToVector(const std::string& str) {
+        Vector res;
+        for (char c : str) {
+            if (std::isdigit(static_cast<unsigned char>(c))) { 
+                res.big_number.push_back(static_cast<int>(c - '0')); 
             }
         }
-        int d = big_number.size() + other.big_number.size() - 1;
-        result.big_number.erase(result.big_number.begin() + d, result.big_number.end());
+        return res;
+    }
+    
+    std::string numberToText() const {
+        std::string text;
+        for (size_t i = 0; i < big_number.size(); i += 3) {
+            int val = 0;
+    
+            for (size_t j = 0; j < 3 && (i + j) < big_number.size(); ++j) {
+                val = val * 10 + big_number[i + j]; 
+            }
+            if (val >= 0 && val <= 255) {
+                char c = static_cast<char>(val);
+                text += c;
+            }
+        }
+        return text;
+    }
+	
+	void textToNumber(const char& c) {
+        big_number.clear();
+        int digit = static_cast<int>(c);
+        while (digit > 0) {
+            big_number.insert(big_number.begin(), digit % 10);
+            digit /= 10;
+        }
+        if (big_number.empty()) {
+            big_number.push_back(0);
+        }
+    }
+    
+    Vector operator*(const Vector& other) const {
+        size_t maxSize = big_number.size() + other.big_number.size();
+        Vector result(maxSize); 
+    
+        for (size_t i = 0; i < big_number.size(); ++i) {
+            for (size_t j = 0; j < other.big_number.size(); ++j) {
+                result.big_number[maxSize - 1 - (i + j)] += big_number[big_number.size() - 1 - i] * other.big_number[other.big_number.size() - 1 - j];
+            }
+        }
         result.normalize();
         return result;
     }
@@ -216,38 +225,32 @@ public:
             throw std::invalid_argument("Division by zero");
         }
         if (*this < other) {
-            return Vector({0, 0});
+            return Vector({0}); 
         }
-
+    
         Vector result;
         Vector rem;
-
+    
         for (size_t i = 0; i < big_number.size(); ++i) {
             rem.big_number.push_back(big_number[i]);
             rem.normalize();
-
+    
             int digit = 0;
             while (rem >= other) {
                 rem = rem - other;
                 ++digit;
             }
-
+    
             result.big_number.push_back(digit);
         }
-
+    
         result.normalize();
         return result;
     }
-    
-    Vector operator%(const Vector& other) const{
-        Vector result;
-        if(*this<other){
-            return *this;
-        }
-        
-        result=*this-(*this/other)*other;
-        
-        return result;
+
+    Vector operator%(const Vector& other) const {
+        Vector divisionResult = *this / other; 
+        return *this - (divisionResult * other); 
     }
     
     Vector operator++(int){
@@ -258,15 +261,17 @@ public:
     
     static Vector PowBig_Number(const Vector& base, const Vector& exponent, const Vector& mod) {
         Vector res({0, 1}); 
-        Vector base_mod = base % mod;
-		Vector exp = exponent;
-        while (exp > Vector({0, 0})) { 
+        Vector base_mod = base % mod; 
+        Vector exp = exponent;
+    
+        while (exp > Vector({0})) { 
             if (exp.big_number.back() % 2 == 1) { 
-                res = (res * base_mod) % mod;
+                res = (res * base_mod) % mod; 
             }
-            base_mod = (base_mod * base_mod) % mod;
+            base_mod = (base_mod * base_mod) % mod; 
             exp = exp / Vector({0, 2}); 
         }
+        
         return res;
     }
     //алгоритм Евклида + проверка на взаимно простые
@@ -274,9 +279,9 @@ public:
 		Vector x = a;
 		Vector y = b;
 		while (y != Vector({0, 0})) {
-			Vector remainder = x % y;
+			Vector rem = x % y;
 			x = y;
-			y = remainder;
+			y = rem;
 		}
 		return (x == Vector({0, 1})); 
 	}
