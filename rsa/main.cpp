@@ -13,18 +13,18 @@ int main() {
     Vector e, n, d;
     Generate_e_n_d(e, n, d);
 
-    std::string inputMessage;
-    std::cout << "Input text message: ";
-    std::getline(std::cin, inputMessage);
+    std::string inputMessage = "UYG(*&^%$#987654}?><]'/.,QAZ~12ws'";
+    std::cout << "Input text message: UYG(*&^%$#987654}?><]'/.,QAZ~12ws'";
+    //std::getline(std::cin, inputMessage);
     std::cout<<"\n";
     
     std::vector<Vector> RsaCode = Rsa(inputMessage, e, n);
     
     std::cout << "Rsa message: \n";
     for (const auto& i : RsaCode) {
-        std::cout<<i<<"  ";
+        std::cout<<i<<"\n";
     }
-    std::cout<<"\n";
+    std::cout<<"\n\n\n";
     std::string decryptedMessage = DeRsa(RsaCode, d, n);
     std::cout << "Decrypted message: " << decryptedMessage << "\n";
 
@@ -35,7 +35,7 @@ std::vector<Vector> Rsa(const std::string& mes, Vector e, Vector n){
     std::vector<Vector> result;
     for (char c : mes) {
 		Vector part;
-        part.textToNumber(std::string(1, c));
+        part.textToNumber(c);
         //std::cout<<"cod:"<<part<<"\n";
         Vector encryptedChar = Vector::PowBig_Number(part, e, n);
         //std::cout<<"Num cod:"<<encryptedChar<<"\n";
@@ -48,7 +48,7 @@ std::vector<Vector> Rsa(const std::string& mes, Vector e, Vector n){
 std::string DeRsa(std::vector<Vector>& mes,const Vector d,const Vector n){
     std::string ourText;
     for (const Vector& encryptedChar : mes) {
-		//std::cout<<encryptedChar<<"BBBBBBBB\n";
+	//std::cout<<encryptedChar<<"BBBBBBBB\n";
         Vector decryptedChar = Vector::PowBig_Number(encryptedChar, d, n);
         //std::cout<<decryptedChar<<"________\n";
         ourText += decryptedChar.numberToText();
@@ -63,16 +63,24 @@ void Generate_e_n_d(Vector& e, Vector& n, Vector& d){
         Vector({1, 9, 1}),    
         Vector({2, 2, 7}),    
         Vector({2, 9, 3}),
-        Vector({3, 7, 1}),
         Vector({4, 1, 9})
     };
 
 
     Vector p;// = Vector({5, 0, 3});
+    p = Vector::stringToVector("12345678901234969");
+    //std::cout<<(p*p)%Vector({2, 4})<<"\n";  //тоже проверки на то простые ли числа
     Vector q;// = Vector({5, 0, 9});
-    selectDistinctPrimes(primes, p, q);
+    q = Vector::stringToVector("12345678901234883");
+    //std::cout<<(q*q)%Vector({2, 4})<<"\n"; //тоже проверки на то простые ли числа
+    //selectDistinctPrimes(primes, p, q);
     std::cout<<"Private key (p) = "<<p<<"\n";
     std::cout<<"Private key (q) = "<<q<<"\n";
+    /*if(Vector::IsCoprime(p, q)){
+        std::cout<<"yes\n";
+    }else{
+        std::cout<<"no\n";
+    }*/
 
     Vector one ({0, 1});
     Vector nul ({0, 0});
@@ -82,9 +90,10 @@ void Generate_e_n_d(Vector& e, Vector& n, Vector& d){
     Vector fi = (p - one) * (q - one);
     std::cout<<"fi = "<<fi<<"\n";
     int ei=1;
-    e = Vector({0, 2});
+    e = Vector({0, 3});
     while (!Vector::IsCoprime(e, fi)) {
         ei = ei<<1;
+        std::cout<<ei<<"\n";
         e = Vector({0, ei+1});
     }
     std::cout<<"Public key (e) = "<<e<<"\n";
