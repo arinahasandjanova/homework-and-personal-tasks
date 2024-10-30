@@ -16,13 +16,11 @@ private:
             if (big_number[i] >= 10) {
                 // Если находимся в начале, добавляем новый разряд
                 if (i == 0) {
-                    big_number.insert(big_number.begin(), big_number[i] / 10);
-                    big_number[1] %= 10;
-                    break;
-                } else {
-                    big_number[i - 1] += big_number[i] / 10;
+                    big_number.insert(big_number.begin(), 0);
+                    ++i;
                 }
-                big_number[i] %= 10; // Оставляем только последний разряд
+                big_number[i - 1] += big_number[i] / 10;
+                big_number[i] %= 10;
             }
         }
         while (big_number.size() > 1 && big_number[0] == 0) {
