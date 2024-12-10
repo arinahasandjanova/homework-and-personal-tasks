@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include <sstream>
 #include <stdexcept>
 
 double applyOperation(double a, double b, char op) {
@@ -10,7 +9,7 @@ double applyOperation(double a, double b, char op) {
         case '+': return a + b;
         case '-': return a - b;
         case '*': return a * b;
-        case '/': 
+        case '/':
             if (b == 0) {
                 throw std::runtime_error("division by zero");
             }
@@ -21,14 +20,11 @@ double applyOperation(double a, double b, char op) {
 }
 
 double evaluateExpression(const std::string& expression) {
-    std::istringstream stream(expression);
     std::vector<double> numbers;
     std::vector<char> operators;
-    char currentChar;
     std::string currentNumber;
 
-    
-    while (stream >> currentChar) {
+    for (char currentChar : expression) {
         if (isdigit(currentChar) || currentChar == '.') {
             currentNumber += currentChar;
         } else {
@@ -43,7 +39,7 @@ double evaluateExpression(const std::string& expression) {
 
             if (std::string("+-*/^").find(currentChar) != std::string::npos) {
                 if (numbers.size() == operators.size()) {
-                    throw std::invalid_argument("operator isn't in a right spot");
+                    throw std::invalid_argument("operator isn't in a right spot or wrong expression");
                 }
                 operators.push_back(currentChar);
             } else {
@@ -58,6 +54,10 @@ double evaluateExpression(const std::string& expression) {
         } catch (const std::exception&) {
             throw std::invalid_argument("can't convert a number" + currentNumber);
         }
+    }
+
+    if (numbers.size() != operators.size() + 1) {
+        throw std::invalid_argument("wrong expression");
     }
 
     for (size_t i = 0; i < operators.size(); ++i) {
@@ -90,7 +90,7 @@ double evaluateExpression(const std::string& expression) {
 
 bool isValidExpression(const std::string& input) {
     for (char c : input) {
-        if (!(isdigit(c) || c == '+' || c == '-' || c == '*' || 
+        if (!(isdigit(c) || c == '+' || c == '-' || c == '*' ||
               c == '/'|| c == '^' || c == '.')) {
             return false;
         }
@@ -100,7 +100,7 @@ bool isValidExpression(const std::string& input) {
 
 int main() {
     std::string expression;
-    
+
     std::cout << "\n---------Welcome to our, working on the strenght of the goddess, calculator---------\n\n        Remember, that we can help you only with math problems for 6th grade       \n\n";
     do{
         std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~Please type your math expression~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n                        if you want to escape just say stop                          \n";
@@ -111,7 +111,7 @@ int main() {
             std::cout << "\n``Thank you for using our program, but we hope next time you'll choose another one``\n\n";
             break;
         }
-        
+
         try {
             if (expression.empty()) {
                 throw std::invalid_argument("you didn't write anything, try again:(");
@@ -119,8 +119,8 @@ int main() {
 
             for (size_t i = 0; i < expression.size(); ++i) {
                 if (expression[i] == ' ') {
-                    expression.erase(i, 1);  // Удаляем пробел
-                    --i;  // Смещаем индекс назад, так как элементы сдвигаются
+                    expression.erase(i, 1);
+                    --i;
                 }
             }
 
