@@ -4,6 +4,16 @@
 #include <cmath>
 #include <stdexcept>
 
+bool isValidExpression(const std::string& input) {
+    for (char c : input) {
+        if (!(isdigit(c) || c == '+' || c == '-' || c == '*' ||
+              c == '/'|| c == '^' || c == '.')) {
+            return false;
+              }
+    }
+    return true;
+}
+
 double applyOperation(double a, double b, char op) {
     switch (op) {
         case '+': return a + b;
@@ -23,11 +33,18 @@ double evaluateExpression(const std::string& expression) {
     std::vector<double> numbers;
     std::vector<char> operators;
     std::string currentNumber;
+    char lastChar = 'k';
 
     for (char currentChar : expression) {
-        if (isdigit(currentChar) || currentChar == '.') {
+        if(lastChar == '.' && currentChar == '.') {
+            throw std::invalid_argument("wrong expresssion");
+        }
+        if (isdigit(currentChar) || (currentChar == '.' && currentNumber.find(currentChar) == std::string::npos)) {
             currentNumber += currentChar;
         } else {
+            if(currentChar == '.' && currentNumber.find(currentChar) != std::string::npos) {
+                throw std::invalid_argument("wrong expresssion!!");
+            }
             if (!currentNumber.empty()) {
                 try {
                     numbers.push_back(std::stod(currentNumber));
@@ -46,6 +63,7 @@ double evaluateExpression(const std::string& expression) {
                 throw std::invalid_argument(std::string("wrong operator") + currentChar);
             }
         }
+        lastChar = currentChar;
     }
 
     if (!currentNumber.empty()) {
@@ -86,16 +104,6 @@ double evaluateExpression(const std::string& expression) {
     }
 
     return numbers[0];
-}
-
-bool isValidExpression(const std::string& input) {
-    for (char c : input) {
-        if (!(isdigit(c) || c == '+' || c == '-' || c == '*' ||
-              c == '/'|| c == '^' || c == '.')) {
-            return false;
-        }
-    }
-    return true;
 }
 
 int main() {
